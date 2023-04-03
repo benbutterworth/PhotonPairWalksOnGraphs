@@ -56,7 +56,7 @@ This input matrix can have one of two representations:
 ## Excecution Instructions
 Once a parameter file and input matrix have been produced, the simulation can be performed by calling `calc.py` from the command line, shown below:
 ```
-$ python calc.py ~/test-parameters.csv 
+$ python pairphotonwalk.py ~/test-parameters.csv 
 	Evolution of system was performed successfully from parameter file stored at Input File. 
 	The data was successfully stored as Output file.
 
