@@ -54,7 +54,7 @@ This input matrix can have one of two representations:
 >The program is intended to simulate CTQWs on graphs - `unitary` functionality is added to allow the user to calculate the unitary operators for very large adjacency matrices and use these as inputs.
 
 ## Excecution Instructions
-Once a parameter file and input matrix have been produced, the simulation can be performed by calling `calc.py` from the command line, shown below:
+Once a parameter file and input matrix have been produced, the simulation can be performed by calling `pairphotonwalk.py` from the command line, shown below:
 ```
 $ python pairphotonwalk.py ~/test-parameters.csv 
 	Evolution of system was performed successfully from parameter file stored at Input File. 
