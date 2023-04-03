@@ -4,12 +4,12 @@
 `pairphotonwalk` is a command line tool that performs a continuous time quantum walk (CTQW) of two partially distinguishable photons on a given undirected graph or unitary matrix. It calculates the coincidence probability, $\Gamma_{ij}$, of detecting one photon in mode $i$ and one photon in mode $j$ , at regular time intervals for a specified duration.
 
 ## Project Files Description
-+  **`calc.py`**
++  **`pairphotonwalk.py`**
 	Reads a user defined parameter file and simulates a CTQW of two photons as described therein.
 + **`save.py`**
-	A utility module that provides functions for reading and writing output data from `calc.py`.
+	A utility module that provides functions for reading and writing output data from `pairphotonwalk.py`.
 + **`pars.py`**
-	Contains the essential information `calc.py` and `save.py` need to run.
+	Contains the essential information `pairphotonwalk.py` and `save.py` need to run.
 + **`parameter-example.csv`**
 	An example parameter file that will perform a CTQW of two identical particles injected into the edge modes of a line graph of degree 10 for 10s in intervals of 0.2s.
 + **`adjacency-example.csv`**
@@ -29,7 +29,7 @@ Within pars.py you should
 
 ### Creating a parameter file
 
-The parameter file specifies all the conditions of the CTQW to be simulated and is provided as an input to `calc.py`. Below is a list of the parameters the user controls; these *must* be specified within the parameter file.
+The parameter file specifies all the conditions of the CTQW to be simulated and is provided as an input to `pairphotonwalk.py`. Below is a list of the parameters the user controls; these *must* be specified within the parameter file.
 
 | Parameter | Aspect Controlled |
 | --- | --- |
