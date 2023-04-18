@@ -84,7 +84,7 @@ The user can use flags to have additional control over how `pairphotonwalk` exce
 + `-n` to not save outputs to output file. **NOT RECCOMENDED.**
 
 ## Interpreting Outputs
-`pairphotonwalk`  outputs a set of correlation matrices, $G=\qty{ \Gamma(t)  \ \forall \ t\in [0, D ] }$, where $\Gamma(t)$ is the correlation matrix associated with the $t^{\text{th}}$ time-step and $D$ is the duration of the simulation. The elements of $\Gamma(t)$ are the coincidence probabilities, $\Gamma_{ij}$, of detecting one photon in mode $i$ and one photon in mode $j$ . $G$ is saved as a .csv file, where the $n^{\text{th}}$  row is the flattened correlation matrix associated with the $n^{\text{th}}$ timestep,  $\Gamma(n \cdot$  `time step` $)$ .
+`pairphotonwalk`  outputs a set of correlation matrices, $G=${$\Gamma(t)  \ \forall \ t\in [0, D ]$}, where $\Gamma(t)$ is the correlation matrix associated with the $t^{\text{th}}$ time-step and $D$ is the duration of the simulation. The elements of $\Gamma(t)$ are the coincidence probabilities, $\Gamma_{ij}$, of detecting one photon in mode $i$ and one photon in mode $j$ . $G$ is saved as a .csv file, where the $n^{\text{th}}$  row is the flattened correlation matrix associated with the $n^{\text{th}}$ timestep,  $\Gamma(n \cdot$  `time step` $)$ .
 
 ## References 
 [1] A. Peruzzo _et al._, ‘Quantum Walks of Correlated Photons’, _Science_, vol. 329, no. 5998, pp. 1500–1503, Sep. 2010, doi: [10.1126/science.1193515](https://doi.org/10.1126/science.1193515). \
