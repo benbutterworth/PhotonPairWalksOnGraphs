@@ -81,10 +81,12 @@ The user can use flags to have additional control over how `pairphotonwalk` exce
 + `-h` for help running `pairphotonwalk`.
 + `-p` to print the last correlation matrix to the terminal.
 + `-v` to print runtime information upon completion.
-+ `-n` to not save outputs to output file. **NOT RECCOMENDED.**
++ `-n` to not save outputs to output file. **NOT RECOMENDED.**
 
 ## Interpreting Outputs
-`pairphotonwalk`  outputs a set of correlation matrices, $G=${$\Gamma(t)  \ \forall \ t\in [0, D ]$}, where $\Gamma(t)$ is the correlation matrix associated with the $t^{\text{th}}$ time-step and $D$ is the duration of the simulation. The elements of $\Gamma(t)$ are the coincidence probabilities, $\Gamma_{ij}$, of detecting one photon in mode $i$ and one photon in mode $j$ . $G$ is saved as a .csv file, where the $n^{\text{th}}$  row is the flattened correlation matrix associated with the $n^{\text{th}}$ timestep,  $\Gamma(n \cdot$  `time step` $)$ .
+The output of the simulation is a set of correlation matrices, $G= \\{ \Gamma(t)  \ \forall \ t\in [0, D ] \\}$, where $\Gamma(t)$ is the correlation matrix associated with the $t^{\text{th}}$ time-step and $D$ is the duration of the simulation. The elements of $\Gamma(t)$ are the coincidence probabilities, $\Gamma_{ij}$, of detecting one photon in mode $i$ and one photon in mode $j$ . 
+
+`pairphotonwalk` saves $G$ as a .csv file, where the $n^{\text{th}}$  row is the flattened correlation matrix associated with the $n^{\text{th}}$ timestep,  $\Gamma(n \cdot$  `time step` $)$ .
 
 ## References 
 [1] A. Peruzzo _et al._, ‘Quantum Walks of Correlated Photons’, _Science_, vol. 329, no. 5998, pp. 1500–1503, Sep. 2010, doi: [10.1126/science.1193515](https://doi.org/10.1126/science.1193515). \
@@ -99,5 +101,6 @@ The user can use flags to have additional control over how `pairphotonwalk` exce
 This program was produced as a part of the authors Physics MSci final year project on _"Simulating Continuous Time Quantum Walks on Complex Graphs"_ under the supervision of J. Matthews and J. Frazer at The University of Bristol.
 
 Credit: Benjamin Butterworth, 2023
+
 [![GitHub Badge](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/benbutterworth) 
 [![LinkedIn Badge](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/bszbutterworth/)
