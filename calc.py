@@ -1,48 +1,55 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Mar  7 15:45:14 2023
+NAME
+    calc
 
-@author: ben
+DESCRIPTION
+    Calc
+    ====
+    
+    Compute the time evolution of continous time quantum walks (CTQWs) of two
+    photons of arbitrary distinguishability by calculating the correlation
+    matrix - the matrix whose elements are the liklihood of detecting a two
+    photon coincidence in a photon count detector.
+    
+    Provides:
+    1. Tools to compute the correlation matrix of a 2 photon CTQW.
+    2. Calculate action of arbitrary sequence of unitary evolutions on a CTQW
+        a. throughout a set period of time
+        b. for different degrees of distinguishability.
+    3. Utility functions to check function inputs
+
+FUNCTIONS
+    can_evolve()
+        
+    check_square_array()
+        
+    check_unitary()
+        
+    evolve_state()
+        
+    form_generator_matrix()
+        
+    get_correlation_matrix()
+        
+    is_good_correlations()
+        
+    is_hermitian()
+        
+    is_unitary()
+        
+    is_valid_mode()
+        
+    is_valid_timestep()
+        
+    vary_theta_evolutions()
+        
 """
-# =============================================================================
-# START TIMING THE PROGRAM
-# =============================================================================
-from time import perf_counter
-import argparse
-start_time = perf_counter()
-
-
-# =============================================================================
-# SETUP ARGUMENT PARSING FROM CMDLINE
-# =============================================================================
-parser = argparse.ArgumentParser(description="Perform a 2-photon continuous time quantum random walk on a system described by an input file")
-parser.add_argument('FILE', help="path to parameter file for system, starting in D:/02_University/04_MSc/00_Project/04-Data/pairphotonwalk/")
-args = parser.parse_args()
-
-
 # =============================================================================
 # IMPORT OFFICIAL & SELF WRITTEN MODULES
 # =============================================================================
 import numpy as np
-import networkx as nx
-from scipy.linalg import expm
-# Self written
-import save
 import pars # where all shared information is stored
-
-
-# =============================================================================
-# GET USER PARAMETERS:
-# theta, timestep, duration, initial_mode,input_format, input_file, output_file
-# =============================================================================
-path = "D:/02_University/04_MSc/00_Project/04-Data/pairphotonwalk/"
-save.load_parameters(path+args.FILE)
-
-
-# =============================================================================
-# READ IN ARRAY INFORMATION
-# =============================================================================
-array = save.load_array_from_csv(pars.input_file)
 
 
 # =============================================================================
@@ -99,8 +106,9 @@ def is_hermitian(array):
         return False
 
 # Check modes agaisnt dimensions of system
-def is_valid_mode(mode_tuple,array):
-    shape = array.shape[0]
+def is_valid_mode(mode_tuple,unitary):
+    # Check there are no modes outside the dimensions of the unitary
+    shape = unitary.shape[0]
     degree= max(mode_tuple)
     if not degree<=shape:
         return False
@@ -110,21 +118,21 @@ def is_valid_mode(mode_tuple,array):
 # Check timesteps is valid
 def is_valid_timestep():
     """See if the input timestep is valid"""
-    is_right_type = (isinstance(pars.duration,(float,int)), isinstance(pars.timestep,(float,int)))
-    if not all(is_right_type):
+    # modify for a list of durations!
+    # from save we know all of durations are floats and timestep is float
+
+    any_negative = any([i<0 for i in pars.duration]) or pars.timestep < 0
+    if any_negative:
         return False
-    is_negative = (pars.duration<0,pars.timestep<0)
-    if any(is_negative):
-        return False
-    if pars.duration<pars.timestep:
+    if any([i<pars.timestep for i in pars.duration]):
         return False
     else:
         return True
 
 # Combination checker.
-def can_evolve():
+def can_evolve(unitary):
     # find success condition - must pass all tests to proceed
-    conditions = (is_valid_mode(pars.initial_mode,array),is_valid_timestep())
+    conditions = (is_valid_mode(pars.initial_mode,unitary),is_valid_timestep())
     if all(conditions):
         return True
     else:
@@ -159,65 +167,12 @@ def form_generator_matrix(adjacency):
         raise Exception("Unable to interpret adjacency as adjacency matrix of graph")
     pass
 
-# =============================================================================
-# PERFORM CHECKS ON DATA
-# =============================================================================
-if can_evolve():
-    pass
-else:
-    raise Exception("Fatal Error Occured! Parameters for system evolution (timestep, duration, input_mode)")
-
-check_square_array(array)
-
-
-# =============================================================================
-# GET THE UNITARY MATRIX & ENSURE VALID.
-# =============================================================================
-if __name__ =="__main__":
-    if pars.input_format == 'adjacency':
-        # Check that array will create a unitary
-        if is_hermitian(array):
-            graph = nx.from_numpy_array(array)
-            #Maybe time how long this takes and offer to save matrix afterwards?
-            #   array = form_generator_matrix(array)
-            unitary = expm(1j*array*pars.timestep)
-        else:
-            raise Exception("array does not represent adjacency matrix")
-    
-    elif pars.input_format == 'unitary':
-        graph = None
-        # Check that array is unitary, throw exception if not
-        if is_unitary(array):
-            unitary = array
-        else:
-            check_unitary(array)
-    
-    else:
-        raise Exception("Unknown input_format: must be 'adjacency' or 'unitary.")
-
-
-# =============================================================================
-# USER PARAMETER DERIVED SIMULATION PARAMETERS
-# =============================================================================
-# Derive number of timesteps after init state, min 1 as timestep>=duration
-T = int(pars.duration//pars.timestep)
-
-# Define sin(theta) and cos(theta) now to save computation time
-sintheta = np.sin(pars.theta)
-costheta = np.cos(pars.theta)
-
-# Define input modes using graph index notation from 1-N where dim(system)=N
-mode1 = pars.initial_mode[0] -1
-mode2 = pars.initial_mode[1] -1
-state = (mode1,mode2)
-
-
 
 # =============================================================================
 # FUNCTIONS TO GET CORRELATION MATRICES & DATA
 # =============================================================================
 # Function for creating correlation matrix from a starting state and unitary.
-def get_correlation_matrix(state,unitary):
+def get_correlation_matrix(state,unitary,distinguishability=0):
     """
     Calculate the correlation matrix for measurements taken after unitary is applied to initial mode state.
 
@@ -227,6 +182,9 @@ def get_correlation_matrix(state,unitary):
         DESCRIPTION.
     unitary : numpy.ndarray
         DESCRIPTION.
+    distinguishability: float
+        Varies 0-1, equal to the proportion of distinguishable particles 
+        (sin^2 theta). The default is 0, meaning perfectly identical photons.
 
     Returns
     -------
@@ -236,6 +194,7 @@ def get_correlation_matrix(state,unitary):
     """
     mode1=state[0]
     mode2=state[1]
+    d = distinguishability
     delta = lambda x,y: 0.5 if x==y else 1
     dim = unitary.shape[0]
     corr_mat = np.zeros((dim,dim))
@@ -249,10 +208,10 @@ def get_correlation_matrix(state,unitary):
             identical = abs(pair1+pair2)**2
             distinct  = abs(pair1)**2 + abs(pair2)**2
             # I think this is right
-            corr_mat[p,q] = delta(p,q)* (identical*costheta**2 +distinct*sintheta**2)
+            corr_mat[p,q] = delta(p,q)* (identical*(1-d) +distinct*d)
     return corr_mat
 
-def evolve_state(state, steps_tuple, unitary_tuple, theta=pars.theta):
+def evolve_state(state, steps_tuple, unitary_tuple, theta=0):
     """
     Calculate the set of correlation matrices for each timestep t of a system 
     evolving via the 1st unitary in unitary_tuple for a number of steps equal
@@ -261,6 +220,8 @@ def evolve_state(state, steps_tuple, unitary_tuple, theta=pars.theta):
 
     Parameters
     ----------
+    state : tuple
+        Tuple containing the initial modes of the system.
     steps_tuple : tuple
         Tuple of integers denoting the number of steps the ith unitary be
         applied to the system for.
@@ -290,13 +251,16 @@ def evolve_state(state, steps_tuple, unitary_tuple, theta=pars.theta):
     """
     # for a given set of unitarys in unitary_tuple,each to be performed a certain number of times dicttated by steps_tuple, evolve the system accordingly.
     
-    global sintheta, costheta
+    distinguishability = np.sin(theta)**2 # proportion of distinct photons
+    
+    # convert 1...N mode indexing to 0...N python indexing
+    state = tuple([i-1 for i in state])
     
     # Error Checking:
     # 1. All items must be ints (1a) or ndarrays (1b)
     # 2. All ndarrays must represent unitary matrices
     # 3. All unitary matrices must represent the same system i.e. same dim.
-    is_ints     = all([isinstance(t,int) for t in steps_tuple])
+    is_ints     = all([isinstance(t,(int,np.int32)) for t in steps_tuple])
     is_arrays   = all([isinstance(U,np.ndarray) for U in unitary_tuple])
     is_unitarys = all([is_unitary(U) for U in unitary_tuple])
     is_float    = isinstance(theta,(float, int))
@@ -314,15 +278,12 @@ def evolve_state(state, steps_tuple, unitary_tuple, theta=pars.theta):
     if not is_float:
         raise TypeError("evolve_state requires theta to be a float")
     
-    # Make sure the theta values are initialised
-    sintheta = np.sin(theta)
-    costheta = np.cos(theta)
     # Generate empty dataset to store correlation matrices
     dim = (unitary_tuple[0]).shape[0]
     data = np.zeros( (sum(steps_tuple)+1, dim, dim), dtype=float)
     # Initialise 1st correlation matrix
-    data[0,mode1,mode2] = 1
-    data[0,mode2,mode1] = 1
+    data[0,state[0],state[1]] = 1
+    data[0,state[1],state[0]] = 1
     # Create an overall increment counter, t, to track whole system evolution
     t = 1
     
@@ -337,7 +298,7 @@ def evolve_state(state, steps_tuple, unitary_tuple, theta=pars.theta):
         for step in range(ti): #i.e. do ti times
             unitary  = Ui @ unitary #np.matmul(Ui,unitary)
             # unitary  = unitary @ Ui
-            corr_mat = get_correlation_matrix(state, unitary)
+            corr_mat = get_correlation_matrix(state, unitary, distinguishability)
             data[t]  = corr_mat
             t+=1 #increment total number of steps so far
     return data
@@ -365,9 +326,7 @@ def vary_theta_evolutions(steps_tuple,unitary_tuple,theta_tuple):
     if not all_same_shape:
         raise Exception("evolve_states requires each unitary matrix in unitary_tuple to have the same shape in order to act on the same system.")
     if not is_floats:
-        raise TypeError("evolve_state requires theta_tuple to be a tuple of floats")    
-    
-    global sintheta, costheta
+        raise TypeError("evolve_state requires theta_tuple to be a tuple of floats")
     
     # Create dataset to store correlation matrices
     dim = (unitary_tuple[0]).shape[0]
@@ -377,38 +336,7 @@ def vary_theta_evolutions(steps_tuple,unitary_tuple,theta_tuple):
     for pair in zip(steps_tuple, unitary_tuple):
          unitary = np.linalg.matrix_power(pair[1], pair[0]) @ unitary
     # Find the correlation matrix for the system for every value of theta given
-    for i,theta in enumerate(theta_tuple):
-        sintheta = np.sin(theta)
-        costheta = np.cos(theta)
-        data[i] = get_correlation_matrix(pars.initial_mode, unitary)
+    distinguishabilites = np.sin(np.array(theta_tuple))**2
+    for i,d in enumerate(distinguishabilites):
+        data[i] = get_correlation_matrix(pars.initial_mode, unitary, d)
     return data
-
-# =============================================================================
-# PERFORM WHOLE EVOLUTION OF SYSTEM
-# =============================================================================
-
-if __name__ =="__main__":
-    data = evolve_state(state,(T,), (unitary,))
-    
-    # Raise warnings where correlation matrix is not satisfactory
-    status_correlations = [is_good_correlations(corr_mat) for corr_mat in data]
-    loc_bad_correlations= [loc for loc,truthvalue in enumerate(status_correlations) if truthvalue==False]
-    for step in loc_bad_correlations:
-        print(f"WARNING - Bad Correlation Matrix detected at timestep t={step}")
-
-
-    # =========================================================================
-    # SAVE DATA TO FILE
-    # =========================================================================
-    save.save_data_to_csv(pars.output_file, data)
-
-
-    # =========================================================================
-    # PRINT RUNNING INFORMATION
-    # =========================================================================
-    stop_time = perf_counter()
-    
-    print("Evolution of system was performed successfully from parameter file stored at Input File. \n The data was successfully stored as Output file.\n")
-    print(f"Input File  : {pars.input_file}")
-    print(f"Output File : {pars.output_file}")
-    print(f"Runtime     : {stop_time-start_time}s")
