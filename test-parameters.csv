@@ -1,9 +1,0 @@
-theta,0
-time-step,1
-duration,20
-initial mode,1 10
-input format,adjacency
-input file path,CURRENT-DIRECTORY\adjacency-example.csv
-output file path,REPLACE-WITH-OUTPUT-PATH
-output file name,test_data.csv
-description,Walk of 2 perfectly distinguishable photons on a line graph with 10 nodes calculated from an adjacency matrix. One photon is initially in mode 1 on the leftmost point of the line and the other on the rightmost node 10.
