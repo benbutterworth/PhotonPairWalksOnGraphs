@@ -251,7 +251,7 @@ def save_array_to_csv(path, name, array):
     None
     """
     df = pd.DataFrame(array)
-    df.to_csv(path, name)
+    df.to_csv(path+name)
 
 def load_array_from_csv(filename):
     """
